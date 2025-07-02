@@ -10,6 +10,7 @@ Attribute VB_Exposed = False
 ' === clsWordEditor ===
 Option Explicit
 
+' 2025-07-02, h, p, t (table) and smart quotes
 ' 2025-07-01, InsertReference
 
 Private mRange As Range
@@ -25,7 +26,7 @@ Public Sub InsertReference(styleName As String, prefix As Variant)
 
     found = False
 
-    If LCase(styleName) = "picture" Then
+    If LCase(styleName) = "p" Then
         refType = "Picture"
         refList = ActiveDocument.GetCrossReferenceItems(refType)
 
@@ -38,7 +39,20 @@ Public Sub InsertReference(styleName As String, prefix As Variant)
             End If
         Next i
 
-    ElseIf LCase(styleName) = "heading" Then
+    ElseIf LCase(styleName) = "t" Then
+        refType = "Table"
+        refList = ActiveDocument.GetCrossReferenceItems(refType)
+
+        For i = 1 To UBound(refList)
+            itemText = Trim(CStr(refList(i)))
+            If itemText Like prefix & "*" Then
+                foundIndex = i
+                found = True
+                Exit For
+            End If
+        Next i
+
+    ElseIf LCase(styleName) = "h" Then
         refList = ActiveDocument.GetCrossReferenceItems(wdRefTypeHeading)
 
         For i = 1 To UBound(refList)
@@ -66,7 +80,7 @@ Public Sub InsertReference(styleName As String, prefix As Variant)
     ' Determine if the current line is empty
     Dim currentLineRange As Range
     Set currentLineRange = Selection.Paragraphs(1).Range
-    If Len(Trim(Replace(currentLineRange.Text, Chr(13), ""))) > 0 Then
+    If Len(Trim(Replace(currentLineRange.Text, Chr(13), ""))) > 0 And Trim(Replace(currentLineRange.Text, Chr(13), "")) <> Chr(9) & "Next process:" & Chr(9) Then
         ' Line has text, insert opening quote
         Selection.TypeText ChrW(CLng(8216))
         shouldCloseQuote = True
@@ -94,7 +108,7 @@ Public Sub InsertReference(styleName As String, prefix As Variant)
 
                 Select Case tag
                     Case "NUMBER"
-                        If LCase(styleName) = "heading" Then
+                        If LCase(styleName) = "h" Then
                             Selection.InsertCrossReference ReferenceType:=wdRefTypeHeading, _
                                 ReferenceKind:=wdNumberNoContext, ReferenceItem:=foundIndex, _
                                 InsertAsHyperlink:=True, IncludePosition:=False, _
@@ -107,7 +121,7 @@ Public Sub InsertReference(styleName As String, prefix As Variant)
                         End If
 
                     Case "TEXT"
-                        If LCase(styleName) = "heading" Then
+                        If LCase(styleName) = "h" Then
                             Selection.InsertCrossReference ReferenceType:=wdRefTypeHeading, _
                                 ReferenceKind:=wdContentText, ReferenceItem:=foundIndex, _
                                 InsertAsHyperlink:=True, IncludePosition:=False, _
@@ -120,7 +134,7 @@ Public Sub InsertReference(styleName As String, prefix As Variant)
                         End If
 
                     Case "PAGENUMBER"
-                        If LCase(styleName) = "heading" Then
+                        If LCase(styleName) = "h" Then
                             Selection.InsertCrossReference ReferenceType:=wdRefTypeHeading, _
                                 ReferenceKind:=wdPageNumber, ReferenceItem:=foundIndex, _
                                 InsertAsHyperlink:=True, IncludePosition:=False, _
