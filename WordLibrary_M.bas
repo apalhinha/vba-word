@@ -82,17 +82,4 @@ Private Sub TestWordEditor()
     Exit Sub
 End Sub
 
-Public Sub InsertCrossReference()
-    Dim editor As New clsWordEditor
-    Dim styleName As String
-    Dim prefix As String
-    
-    styleName = InputBox("Enter the style (e'Heading' or 'Picture'):", "Style")
-    If styleName = "" Then Exit Sub
-    
-    prefix = InputBox("Enter the numeric prefix (e.g., '2.3.' or 'Process 1.2.'):", "Prefix")
-    If prefix = "" Then Exit Sub
-    
-    editor.InitializeAtCursor
-    editor.InsertReference styleName, prefix
-End Sub
+
