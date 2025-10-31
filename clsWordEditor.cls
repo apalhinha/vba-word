@@ -15,7 +15,7 @@ Option Explicit
 
 Private mRange As Range
 
-Public Sub InsertReference(styleName As String, prefix As Variant)
+Public Sub OLDInsertReference(styleName As String, prefix As Variant)
     Dim refList As Variant
     Dim i As Long
     Dim foundIndex As Long
@@ -204,4 +204,8 @@ Public Sub InsertNewLine()
     mRange.Collapse Direction:=wdCollapseEnd
     mRange.Select
 End Sub
+
+
+
+
 
